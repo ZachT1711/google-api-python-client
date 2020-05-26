@@ -50,6 +50,11 @@ import google.api_core.client_options
 from google.auth.transport import mtls
 from google.auth.exceptions import MutualTLSChannelError
 
+try:
+    import google_auth_httplib2
+except ImportError:  # pragma: NO COVER
+    google_auth_httplib2 = None
+
 # Local imports
 from googleapiclient import _auth
 from googleapiclient import mimeparse
@@ -452,7 +457,8 @@ def build_from_document(
             # httplib2.Http object from google_auth_httplib2.AuthorizedHttp.
             http_channel = (
                 http.http
-                if isinstance(http, google_auth_httplib2.AuthorizedHttp)
+                if google_auth_httplib2
+                and isinstance(http, google_auth_httplib2.AuthorizedHttp)
                 else http
             )
             http_channel.add_certificate(key_path, cert_path, "", passphrase)
