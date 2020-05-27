@@ -386,9 +386,7 @@ def build_from_document(
     elif isinstance(service, six.binary_type):
         service = json.loads(service.decode("utf-8"))
 
-    if ("rootUrl" not in service or "mtlsRootUrl" not in service) and (
-        isinstance(http, (HttpMock, HttpMockSequence))
-    ):
+    if "rootUrl" not in service and isinstance(http, (HttpMock, HttpMockSequence)):
         logger.error(
             "You are using HttpMock or HttpMockSequence without"
             + "having the service discovery doc in cache. Try calling "
@@ -465,7 +463,9 @@ def build_from_document(
 
         # If user doesn't provide api endpoint via client options, decide which
         # api endpoint to use.
-        if not client_options or not client_options.api_endpoint:
+        if "mtlsRootUrl" in service and (
+            not client_options or not client_options.api_endpoint
+        ):
             mtls_endpoint = urljoin(service["mtlsRootUrl"], service["servicePath"])
             use_mtls_env = os.getenv("GOOGLE_API_USE_MTLS", "Never")
 
